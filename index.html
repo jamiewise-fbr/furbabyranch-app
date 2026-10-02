@@ -167,6 +167,7 @@ a { color: inherit; }
   display: grid; place-items: center; color: var(--ph-paw);
 }
 .photo.a { background: var(--ph-a); } .photo.b { background: var(--ph-b); } .photo.c { background: var(--ph-c); }
+.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .photo svg { width: 38%; height: auto; aspect-ratio: 1; opacity: .22; }
 .pill {
   position: absolute; left: 8px; top: 8px; padding: 3px 9px; border-radius: 999px;
@@ -174,7 +175,7 @@ a { color: inherit; }
   font: 800 11px/16px var(--sans); letter-spacing: .08em; text-transform: uppercase;
 }
 .pet .body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
-.pet .name { font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 24px; }
+.pet .name { font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 24px; overflow-wrap: anywhere; }
 .pet .meta { font-size: 14px; line-height: 19px; color: var(--muted); }
 
 /* pet detail */
@@ -259,7 +260,7 @@ tbody td:first-child { font-size: 17px; }
     <button class="back" id="back" type="button" hidden><svg class="ic"><use href="#i-back"/></svg>Back</button>
     <span class="word" id="word">Furbaby Ranch</span>
   </header>
-  <p class="draft"><b>Draft preview.</b> The pets shown are examples, not real listings.</p>
+  <p class="draft" id="draft"><b>Draft preview.</b> The pets shown are examples, not real listings.</p>
 
   <main>
     <!-- HOME -->
@@ -277,7 +278,7 @@ tbody td:first-child { font-size: 17px; }
         <a class="tile" href="#more" data-go="more"><svg class="ic"><use href="#i-star"/></svg><span class="t">Shop</span><span class="s">Ranch tees, hoodies and gear</span></a>
       </nav>
 
-      <div class="stack">
+      <div class="stack" id="home-pets-block">
         <div class="row-head"><h2>Meet the furbabies</h2><a class="link" href="#pets" data-go="pets">See all</a></div>
         <div class="grid" id="home-pets"></div>
       </div>
@@ -294,6 +295,7 @@ tbody td:first-child { font-size: 17px; }
         <button class="chip" id="f-dog" type="button" data-filter="Dog" aria-pressed="false">Dogs</button>
         <button class="chip" id="f-cat" type="button" data-filter="Cat" aria-pressed="false">Cats</button>
       </div>
+      <p class="lede" id="pet-status" role="status" hidden></p>
       <div class="grid" id="pet-grid"></div>
     </section>
 
@@ -431,6 +433,12 @@ tbody td:first-child { font-size: 17px; }
 </div>
 
 <script>
+// ---- Settings ----------------------------------------------------------
+// The Apps Script web app address that returns the adoptable pets from
+// Shelterluv. If this is emptied, the app falls back to example pets and
+// the "Draft preview" banner.
+var FEED_URL = 'https://script.google.com/macros/s/AKfycbyVnLKmXz8AUplsLLC98XbyhMy0HkMsTsm8iQGMC1SoGvCneB0u7l9bYBP0o-c_jklp/exec';
+
 // Every outside link lives here so it can be swapped in one place.
 var LINKS = {
   adoptDog: 'https://new.shelterluv.com/matchme/adopt/FRSC/Dog',
@@ -448,11 +456,13 @@ var LINKS = {
   youtube: 'https://www.youtube.com/@furbabyranch',
   tiktok: 'https://www.tiktok.com/@mrdarkco',
   contact: 'https://furbabyranch.com/contact',
+  hub: 'https://furbabyranch.com/links',
+  available: 'https://furbabyranch.com/available-furbabies',
   site: 'https://furbabyranch.com/'
 };
 
-// Example listings only. The live app reads this list from Shelterluv.
-var PETS = [
+// Example listings, shown only while FEED_URL is empty.
+var EXAMPLES = [
   { id: 'biscuit', name: 'Biscuit', kind: 'Dog', breed: 'Hound mix', age: '2 years', sex: 'Male', fixed: 'Neutered', tone: 'a',
     about: 'Biscuit greets everyone like an old friend. He walks well on a leash and rides quietly in the car.' },
   { id: 'juniper', name: 'Juniper', kind: 'Cat', breed: 'Domestic shorthair', age: '1 year', sex: 'Female', fixed: 'Spayed', tone: 'b',
@@ -467,6 +477,11 @@ var PETS = [
     about: 'Pepper is a calm companion who is happiest on a short walk followed by a long nap.' }
 ];
 
+var LIVE = !!FEED_URL;
+var PETS = LIVE ? [] : EXAMPLES;
+var feedState = LIVE ? 'loading' : 'ready'; // loading | ready | error
+var pendingPet = null;
+
 var MAIN = ['home', 'pets', 'adopt', 'apply', 'donate', 'more'];
 var TAB_OF = { home: 'home', pets: 'pets', pet: 'pets', adopt: 'adopt', apply: 'adopt', donate: 'donate', more: 'more' };
 var PARENT = { pet: 'pets', apply: 'adopt' };
@@ -475,11 +490,46 @@ var current = null;
 
 function $(id) { return document.getElementById(id); }
 
+// Pet details come from outside the app, so every value is escaped before
+// it is put on the page.
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// Tidies one pet from the feed into the shape the screens use.
+function cleanPet(r, i) {
+  r = r || {};
+  var kind = /dog/i.test(r.kind) ? 'Dog' : (/cat/i.test(r.kind) ? 'Cat' : String(r.kind || 'Other'));
+  return {
+    id: String(r.id || '').replace(/[^A-Za-z0-9_.~-]/g, '') || ('p' + i),
+    name: String(r.name || 'A furbaby'),
+    kind: kind,
+    breed: String(r.breed || ''),
+    age: String(r.age || '').replace(/\s+old$/i, ''),
+    sex: String(r.sex || ''),
+    fixed: String(r.fixed || ''),
+    about: String(r.about || ''),
+    photo: /^https:\/\//i.test(String(r.photo || '')) ? String(r.photo) : '',
+    tone: 'abc'.charAt(i % 3)
+  };
+}
+
+function photo(p) {
+  return '<div class="photo ' + p.tone + '">' +
+    (LIVE ? '' : '<span class="pill">Example</span>') +
+    '<svg><use href="#i-paw"/></svg>' +
+    (p.photo ? '<img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.remove()">' : '') +
+    '</div>';
+}
+
 function card(p) {
-  return '<a class="pet" href="#pet-' + p.id + '" data-go="pet-' + p.id + '">' +
-    '<div class="photo ' + p.tone + '"><span class="pill">Example</span><svg><use href="#i-paw"/></svg></div>' +
-    '<div class="body"><span class="name">' + p.name + '</span>' +
-    '<span class="meta">' + p.breed + '</span><span class="meta">' + p.age + ' · ' + p.sex + '</span></div></a>';
+  var line2 = [p.age, p.sex].filter(Boolean).join(' · ');
+  return '<a class="pet" href="#pet-' + p.id + '" data-go="pet-' + p.id + '">' + photo(p) +
+    '<div class="body"><span class="name">' + esc(p.name) + '</span>' +
+    (p.breed ? '<span class="meta">' + esc(p.breed) + '</span>' : '') +
+    (line2 ? '<span class="meta">' + esc(line2) + '</span>' : '') + '</div></a>';
 }
 
 function renderGrid() {
@@ -489,22 +539,47 @@ function renderGrid() {
   for (var i = 0; i < chips.length; i++) {
     chips[i].setAttribute('aria-pressed', String(chips[i].getAttribute('data-filter') === filter));
   }
+  var status = $('pet-status'), msg = '';
+  if (feedState === 'loading') {
+    msg = 'Loading furbabies…';
+  } else if (feedState === 'error') {
+    msg = 'We could not load the furbabies just now. Check your connection, or <a class="link" href="' +
+      LINKS.available + '" target="_blank" rel="noopener">see them on our website</a>.';
+  } else if (!list.length) {
+    msg = filter === 'Dog' ? 'No dogs are listed right now. Check back soon.'
+      : filter === 'Cat' ? 'No cats are listed right now. Check back soon.'
+      : 'No furbabies are listed right now. Check back soon.';
+  }
+  status.innerHTML = msg;
+  status.hidden = !msg;
+}
+
+function renderHome() {
+  $('home-pets').innerHTML = PETS.slice(0, 2).map(card).join('');
+  $('home-pets-block').hidden = !PETS.length;
+}
+
+function renderAll() {
+  renderHome();
+  renderGrid();
+  if (pendingPet && feedState !== 'loading') { var name = pendingPet; pendingPet = null; go(name, { first: true }); }
 }
 
 function renderPet(p) {
-  var fee = p.kind === 'Dog' ? '$400' : '$150';
+  var fee = p.kind === 'Dog' ? '$400' : (p.kind === 'Cat' ? '$150' : '');
+  var apply = p.kind === 'Dog' ? LINKS.adoptDog : (p.kind === 'Cat' ? LINKS.adoptCat : LINKS.hub);
+  var stats = [['Age', p.age], ['Breed', p.breed], ['Sex', p.sex], ['Fixed', p.fixed]]
+    .filter(function (s) { return s[1]; })
+    .map(function (s) { return '<div class="stat"><span class="eyebrow">' + s[0] + '</span><b>' + esc(s[1]) + '</b></div>'; })
+    .join('');
   $('v-pet').innerHTML =
-    '<div class="detail-photo"><div class="photo ' + p.tone + '"><span class="pill">Example</span><svg><use href="#i-paw"/></svg></div></div>' +
-    '<div class="stack"><p class="eyebrow">Available now</p><h1 tabindex="-1">Meet ' + p.name + '</h1><p>' + p.about + '</p></div>' +
-    '<div class="stats">' +
-      '<div class="stat"><span class="eyebrow">Age</span><b>' + p.age + '</b></div>' +
-      '<div class="stat"><span class="eyebrow">Breed</span><b>' + p.breed + '</b></div>' +
-      '<div class="stat"><span class="eyebrow">Sex</span><b>' + p.sex + '</b></div>' +
-      '<div class="stat"><span class="eyebrow">Fixed</span><b>' + p.fixed + '</b></div>' +
-    '</div>' +
-    '<div class="stack"><a class="btn primary" href="' + (p.kind === 'Dog' ? LINKS.adoptDog : LINKS.adoptCat) + '" target="_blank" rel="noopener">Apply to adopt ' + p.name +
+    '<div class="detail-photo">' + photo(p) + '</div>' +
+    '<div class="stack"><p class="eyebrow">Available now</p><h1 tabindex="-1">Meet ' + esc(p.name) + '</h1>' +
+      (p.about ? '<p>' + esc(p.about) + '</p>' : '') + '</div>' +
+    (stats ? '<div class="stats">' + stats + '</div>' : '') +
+    '<div class="stack"><a class="btn primary" href="' + apply + '" target="_blank" rel="noopener">Apply to adopt ' + esc(p.name) +
       '<svg class="ic"><use href="#i-ext"/></svg></a>' +
-    '<p class="hint">Adoption fee: ' + fee + ' for local South Carolina adopters. ' +
+    '<p class="hint">' + (fee ? 'Adoption fee: ' + fee + ' for local South Carolina adopters. ' : '') +
       '<a class="link" href="#adopt" data-go="adopt">See all fees and transport</a></p></div>';
 }
 
@@ -512,6 +587,7 @@ function go(name, opts) {
   var view = name, pet = null;
   if (name.indexOf('pet-') === 0) {
     pet = PETS.filter(function (p) { return p.id === name.slice(4); })[0];
+    if (!pet && feedState === 'loading') pendingPet = name; // open it once the list arrives
     view = pet ? 'pet' : 'pets';
     if (!pet) name = 'pets';
   } else if (MAIN.indexOf(name) < 0) {
@@ -530,7 +606,7 @@ function go(name, opts) {
   $('back').setAttribute('data-go', PARENT[view] || 'home');
   current = name;
 
-  if (!(opts && opts.fromHash)) {
+  if (!(opts && opts.fromHash) && !pendingPet) {
     try { if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name); } catch (e) {}
   }
   if (!(opts && opts.first)) {
@@ -540,11 +616,34 @@ function go(name, opts) {
   }
 }
 
+// Shows the last list this phone saw straight away, then swaps in the
+// fresh one. If the fresh one cannot be loaded, the saved list stays.
+function loadPets() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('fbr-pets') || 'null');
+    if (saved && saved.length) { PETS = saved; feedState = 'ready'; renderAll(); }
+  } catch (e) {}
+  fetch(FEED_URL)
+    .then(function (res) { if (!res.ok) throw new Error('feed ' + res.status); return res.json(); })
+    .then(function (data) {
+      if (!data || data.ok === false || !Array.isArray(data.pets)) throw new Error('feed unavailable');
+      PETS = data.pets.map(cleanPet);
+      feedState = 'ready';
+      try { localStorage.setItem('fbr-pets', JSON.stringify(PETS)); } catch (e) {}
+      renderAll();
+    })
+    .catch(function () {
+      if (feedState !== 'ready') feedState = 'error';
+      renderAll();
+    });
+}
+
 document.addEventListener('click', function (e) {
   var el = e.target.closest ? e.target.closest('[data-go], [data-filter]') : null;
   if (!el) return;
   if (el.hasAttribute('data-filter')) { filter = el.getAttribute('data-filter'); renderGrid(); return; }
   e.preventDefault();
+  pendingPet = null;
   go(el.getAttribute('data-go'));
 });
 window.addEventListener('hashchange', function () {
@@ -555,9 +654,10 @@ window.addEventListener('hashchange', function () {
 (function start() {
   var out = document.querySelectorAll('[data-link]');
   for (var i = 0; i < out.length; i++) out[i].setAttribute('href', LINKS[out[i].getAttribute('data-link')]);
-  $('home-pets').innerHTML = PETS.slice(0, 2).map(card).join('');
-  renderGrid();
+  $('draft').hidden = LIVE;
+  renderAll();
   go(location.hash.replace('#', '') || 'home', { first: true, fromHash: true });
+  if (LIVE) loadPets();
 })();
 </script>
 

@@ -2,7 +2,7 @@
 
 The Furbaby Ranch mobile app. It is a single web page that people can add to their phone's home screen, so it needs no app store.
 
-**Status: draft.** The pets shown are examples. Real listings come once the app reads from Shelterluv.
+**Status: not yet online.** The app shows real adoptable pets from Shelterluv, through the pet feed in the Furbaby Ranch Apps Script project (`AppFeed.gs`). GitHub Pages has not been turned on yet.
 
 ## What's here
 
@@ -16,7 +16,7 @@ The Furbaby Ranch mobile app. It is a single web page that people can add to the
 ## Changing things
 
 - **Links** (applications, donations, shop, social): edit the `LINKS` list near the bottom of `index.html`.
-- **Pets**: the `PETS` list in `index.html` holds the example listings. This is the part that will be replaced by the Shelterluv feed.
+- **Pets**: these come from Shelterluv automatically and refresh about every 15 minutes, so add, edit or remove pets in Shelterluv, not here. `FEED_URL` near the bottom of `index.html` holds the feed address. If it is emptied, the app shows the `EXAMPLES` list and a "Draft preview" banner.
 - **Fees and adoption steps**: in the "ADOPT" section of `index.html`.
 - After any change, raise the version in `sw.js` (`fbr-app-v1` to `fbr-app-v2`, and so on) so phones pick up the update.
 
