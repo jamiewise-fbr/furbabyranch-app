@@ -235,6 +235,55 @@ tbody td:first-child { font-size: 17px; }
   font: 700 12px/16px var(--sans);
 }
 .tabs a[aria-current="page"] { color: var(--gold-text); }
+
+/* "Get the app" sheet: slides up from the bottom with the install button or the steps */
+.sheet-wrap { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
+.sheet-dim { position: absolute; inset: 0; background: rgba(10, 9, 9, .55); }
+.sheet {
+  position: relative; width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto;
+  padding: 22px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: var(--ranch-black); color: var(--cream);
+  border: 1px solid var(--hero-edge); border-bottom: 0; border-radius: 20px 20px 0 0;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.sheet .x {
+  position: absolute; right: 10px; top: 10px; width: 44px; height: 44px;
+  display: grid; place-items: center; background: none; border: 0; color: var(--cream); cursor: pointer;
+}
+.sheet .x:focus-visible, .sheet .btn:focus-visible { outline-color: var(--gold); }
+.sheet .head { display: flex; align-items: center; gap: 14px; padding-right: 40px; }
+.sheet .head img { width: 56px; height: 56px; border-radius: 13px; flex: none; }
+.sheet h2 { color: var(--gold); }
+.sheet h2:focus { outline: none; }
+.sheet p { color: var(--cream); }
+.sheet .sub { font-size: 15px; line-height: 21px; color: #CFC6B4; }
+.sheet .btn.primary:focus-visible { outline-color: var(--cream); }
+.sheet .btn.plain { background: none; border-color: #3A3127; color: var(--cream); min-height: 48px; font-size: 16px; }
+.how { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: h; }
+.how li {
+  counter-increment: h; display: grid; grid-template-columns: 30px minmax(0, 1fr) 44px; gap: 12px; align-items: center;
+  padding: 12px; border-radius: var(--r-md); background: #1C1814; border: 1px solid #33291D;
+}
+.how li::before {
+  content: counter(h); width: 30px; height: 30px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--gold); color: var(--ranch-black); font: 800 16px/1 var(--sans);
+}
+.how b { display: block; font-size: 17px; line-height: 22px; }
+.how span { font-size: 14px; line-height: 19px; color: #CFC6B4; }
+.how .key {
+  width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
+  background: #2A241D; color: #4DA3FF; border: 1px solid #3A3127;
+}
+.how .key svg { width: 26px; height: 26px; }
+.how .key.txt { color: var(--cream); font: 800 16px/1 var(--sans); letter-spacing: .02em; }
+.point { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--gold); font-weight: 800; font-size: 15px; }
+.point svg { width: 26px; height: 26px; }
+@media (prefers-reduced-motion: no-preference) {
+  .sheet { animation: rise .28s ease-out; }
+  .point svg { animation: nudge 1.1s ease-in-out infinite; }
+  @keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+}
 @media (prefers-reduced-motion: no-preference) {
   .tile, .btn, .pet, .chip { transition: transform .12s ease; }
   .tile:active, .btn:active, .pet:active, .chip:active { transform: scale(.98); }
@@ -253,7 +302,13 @@ tbody td:first-child { font-size: 17px; }
   <symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16 16.5 7.5M9.5 7.5h7v7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></g></symbol>
   <symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.2v3.3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></g></symbol>
-  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11M8 7.2l4-3.7 4 3.7"/><path d="M8.5 10H6.5a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V11a1 1 0 0 0-1-1h-2"/></g></symbol>
+  <symbol id="i-addhome" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/></g></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></g></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></g></symbol>
+  <symbol id="i-star"viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
 </svg>
 
 <div class="shell">
@@ -413,16 +468,26 @@ tbody td:first-child { font-size: 17px; }
           <a data-link="site" target="_blank" rel="noopener"><span>furbabyranch.com</span><svg class="ic"><use href="#i-ext"/></svg></a>
         </div>
       </div>
-      <div class="stack">
+      <div class="stack" id="more-install">
         <h2>Keep the ranch on your phone</h2>
-        <p class="lede">Once the app is live, you can add it to your home screen like any other app.</p>
-        <ol class="steps">
-          <li><div><b>iPhone</b><span>Tap Share, then Add to Home Screen.</span></div></li>
-          <li><div><b>Android</b><span>Tap the menu, then Add to Home screen.</span></div></li>
-        </ol>
+        <p class="lede">Put Furbaby Ranch on your home screen like any other app. It's free and there's nothing to download from an app store.</p>
+        <button class="btn primary" type="button" data-install><svg class="ic"><use href="#i-phone"/></svg>Add the app to my phone</button>
       </div>
     </section>
   </main>
+
+  <div class="sheet-wrap" id="get-app" hidden>
+    <div class="sheet-dim" data-close></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="get-app-title">
+      <button class="x" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button>
+      <div class="head">
+        <img src="icons/icon-192.png" width="56" height="56" alt="">
+        <div><h2 id="get-app-title" tabindex="-1">Get the Furbaby Ranch app</h2><p class="sub">Free. Opens right from your home screen.</p></div>
+      </div>
+      <div id="get-app-body"></div>
+      <button class="btn plain" type="button" data-close>Maybe later</button>
+    </div>
+  </div>
 
   <nav class="tabs" aria-label="App sections">
     <a href="#home" data-go="home" data-tab="home"><svg class="ic"><use href="#i-home"/></svg>Home</a>
@@ -697,16 +762,165 @@ document.addEventListener('click', function (e) {
 });
 window.addEventListener('hashchange', function () {
   var h = location.hash.replace('#', '');
+  if (h === 'install') { go('home', { fromHash: true }); history.replaceState(null, '', '#home'); openGetApp(); return; }
   if (h && h !== current) go(h, { fromHash: true });
 });
+
+// A link ending in #install (app.furbabyranch.com/#install) opens the
+// "Get the app" steps straight away, handy for texts and social posts.
+var askedInstall = location.hash === '#install';
 
 (function start() {
   var out = document.querySelectorAll('[data-link]');
   for (var i = 0; i < out.length; i++) out[i].setAttribute('href', LINKS[out[i].getAttribute('data-link')]);
   $('draft').hidden = LIVE;
+  if (askedInstall) { try { history.replaceState(null, '', '#home'); } catch (e) {} }
   renderAll();
   go(location.hash.replace('#', '') || 'home', { first: true, fromHash: true });
   if (LIVE) loadPets();
+})();
+</script>
+
+<script>
+// ---- Get the app -------------------------------------------------------
+// Android (Chrome, Samsung Internet, Edge) lets us show a real one-tap
+// "Install" button. iPhones don't allow that, so there we show the three
+// taps with pictures of the buttons to look for. Inside Facebook or
+// Instagram the page can't be added at all, so we say how to open it in
+// the phone's normal browser first. The popup shows up by itself once per
+// phone and never when the app is already installed.
+var installEvent = null;
+var ua = navigator.userAgent || '';
+var IOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+var ANDROID = /Android/i.test(ua);
+var IN_APP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|musical_ly|TikTok|Bytedance|Snapchat|Pinterest|LinkedInApp|Line\/|GSA\//.test(ua);
+var IOS_OTHER = IOS && /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo/.test(ua);
+var SEEN_KEY = 'fbr-install-seen';
+var lastFocus = null;
+
+function installed() {
+  return navigator.standalone === true ||
+    (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches));
+}
+function seen() { try { return localStorage.getItem(SEEN_KEY) === '1'; } catch (e) { return false; } }
+function markSeen() { try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {} }
+
+function step(title, sub, key) {
+  return '<li><div><b>' + title + '</b>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>' +
+    '<span class="key' + (key.charAt(0) === '#' ? '' : ' txt') + '" aria-hidden="true">' +
+    (key.charAt(0) === '#' ? '<svg><use href="' + key + '"/></svg>' : key) + '</span></li>';
+}
+function copyBtn() {
+  return '<button class="btn" type="button" data-copy>Copy the app link</button>';
+}
+var POINT_DOWN = '<p class="point"><svg aria-hidden="true"><use href="#i-down"/></svg>Start at the bottom of your screen</p>';
+
+function getAppBody() {
+  if (installEvent) {
+    return '<p>Tap the button and your phone does the rest.</p>' +
+      '<button class="btn primary" type="button" data-do-install><svg class="ic"><use href="#i-addhome"/></svg>Install the app</button>';
+  }
+  if (IN_APP && IOS) {
+    return '<p>This page is open inside another app, like Facebook or Instagram. iPhones only add apps from Safari, so open it there first.</p>' +
+      '<ol class="how">' +
+        step('Tap the ••• menu', 'Usually in a top or bottom corner.', '•••') +
+        step('Tap Open in Safari', 'It may say Open in browser.', '#i-ext') +
+        step('Then tap Share, Add to Home Screen', 'This popup will walk you through it.', '#i-share') +
+      '</ol>' +
+      '<p class="sub">No Safari option? Copy the link, open Safari and paste it in the address bar.</p>' + copyBtn();
+  }
+  if (IN_APP && ANDROID) {
+    var chrome = 'intent://' + location.host + location.pathname + '#Intent;scheme=https;package=com.android.chrome;end';
+    return '<p>This page is open inside another app, like Facebook or Instagram. Open it in Chrome to add it to your phone.</p>' +
+      '<a class="btn primary" href="' + chrome + '"><svg class="ic"><use href="#i-ext"/></svg>Open in Chrome</a>' +
+      '<p class="sub">Didn\'t work? Tap the ⋮ menu and choose Open in browser, or copy the link and paste it into Chrome.</p>' + copyBtn();
+  }
+  if (IOS) {
+    return '<ol class="how">' +
+        step('Tap the Share button', IOS_OTHER ? 'Next to the web address, or in the menu.' : 'At the bottom of Safari. Don\'t see it? Tap ••• first.', '#i-share') +
+        step('Tap Add to Home Screen', 'Scroll down the list if you need to.', '#i-addhome') +
+        step('Tap Add', 'The ranch logo shows up with your other apps.', 'Add') +
+      '</ol>' + (IOS_OTHER ? '' : POINT_DOWN);
+  }
+  if (ANDROID) {
+    return '<ol class="how">' +
+        step('Tap the menu', 'The ⋮ or ☰ button in a corner of your browser.', '#i-dots') +
+        step('Tap Install app', 'It may say Add to Home screen.', '#i-addhome') +
+        step('Tap Install', 'The ranch logo shows up with your other apps.', '#i-phone') +
+      '</ol>';
+  }
+  return '<p>Open <b>' + esc(location.host) + '</b> on your phone and it will show you how to add it to your home screen.</p>' + copyBtn();
+}
+
+function openGetApp() {
+  if (installed()) return;
+  $('get-app-body').innerHTML = getAppBody();
+  $('get-app-body').className = 'stack';
+  lastFocus = document.activeElement;
+  $('get-app').hidden = false;
+  try { $('get-app-title').focus({ preventScroll: true }); } catch (e) {}
+}
+function closeGetApp() {
+  if ($('get-app').hidden) return;
+  $('get-app').hidden = true;
+  markSeen();
+  if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+}
+
+function copyLink(btn) {
+  var url = location.origin + location.pathname;
+  var done = function () { btn.textContent = 'Link copied'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link:', url); });
+  } else {
+    window.prompt('Copy this link:', url);
+  }
+}
+
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  installEvent = e;
+  if (!$('get-app').hidden) $('get-app-body').innerHTML = getAppBody();
+  // On Android this is the moment we know a one-tap install will work.
+  if (!seen() && !installed()) setTimeout(function () { if ($('get-app').hidden && !seen()) openGetApp(); }, 2500);
+});
+window.addEventListener('appinstalled', function () {
+  installEvent = null;
+  markSeen();
+  $('get-app').hidden = true;
+  $('more-install').hidden = true;
+});
+
+document.addEventListener('click', function (e) {
+  if (!e.target.closest) return;
+  if (e.target.closest('[data-install]')) { openGetApp(); return; }
+  if (e.target.closest('[data-close]')) { closeGetApp(); return; }
+  var copy = e.target.closest('[data-copy]');
+  if (copy) { copyLink(copy); return; }
+  if (e.target.closest('[data-do-install]') && installEvent) {
+    var ev = installEvent;
+    installEvent = null;
+    ev.prompt();
+    ev.userChoice.then(function (r) {
+      if (r && r.outcome === 'accepted') {
+        $('get-app-body').innerHTML = '<p>All set! Look for the Furbaby Ranch logo on your home screen.</p>';
+        markSeen();
+      } else {
+        $('get-app-body').innerHTML = getAppBody();
+      }
+    }, function () { $('get-app-body').innerHTML = getAppBody(); });
+  }
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeGetApp(); });
+
+(function startGetApp() {
+  if (installed()) { $('more-install').hidden = true; return; }
+  if (askedInstall) { openGetApp(); return; }
+  // iPhones and in-app browsers never get the Android install event, so
+  // show them the steps after a short moment on the first visit.
+  if (!seen() && (IOS || (IN_APP && ANDROID))) {
+    setTimeout(function () { if ($('get-app').hidden && !seen() && !installed()) openGetApp(); }, 3000);
+  }
 })();
 </script>
 
