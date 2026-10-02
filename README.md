@@ -2,7 +2,7 @@
 
 The Furbaby Ranch mobile app. It is a single web page that people can add to their phone's home screen, so it needs no app store.
 
-**Status: not yet online.** The app shows real adoptable pets from Shelterluv, through the pet feed in the Furbaby Ranch Apps Script project (`AppFeed.gs`). GitHub Pages has not been turned on yet.
+**Live at https://jamiewise-fbr.github.io/furbabyranch-app/** (hosted with GitHub Pages from the `main` branch). The app shows real adoptable pets from Shelterluv, through the pet feed in the Furbaby Ranch Apps Script project (`AppFeed.gs`).
 
 ## What's here
 
@@ -20,11 +20,9 @@ The Furbaby Ranch mobile app. It is a single web page that people can add to the
 - **Fees and adoption steps**: in the "ADOPT" section of `index.html`.
 - After any change, raise the version in `sw.js` (`fbr-app-v1` to `fbr-app-v2`, and so on) so phones pick up the update.
 
-## Putting it online with GitHub Pages
+## Publishing changes
 
-1. In this repository, open **Settings**, then **Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**, pick `main` and `/ (root)`, and save.
-3. After a minute or two the app is live at the address GitHub shows on that page.
+GitHub Pages is on, so any change committed to the `main` branch goes live within a minute or two. To take the app offline, open **Settings**, then **Pages**, and set the branch to **None**.
 
 ## Keep out of this repository
 
