@@ -1,6 +1,6 @@
 // Furbaby Ranch app: offline cache.
 // Bump CACHE when you change the app so phones pick up the new version.
-var CACHE = 'fbr-app-v3';
+var CACHE = 'fbr-app-v4';
 var SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/logo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', function (e) {

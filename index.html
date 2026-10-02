@@ -114,6 +114,7 @@ a { color: inherit; }
 .lede { color: var(--muted); }
 .row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .link { font-weight: 700; color: var(--gold-text); text-underline-offset: 3px; }
+button.link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 
 /* hero */
 .hero {
@@ -481,6 +482,9 @@ var LIVE = !!FEED_URL;
 var PETS = LIVE ? [] : EXAMPLES;
 var feedState = LIVE ? 'loading' : 'ready'; // loading | ready | error
 var pendingPet = null;
+var fresh = false;    // true once this visit has the live list
+var loading = false;  // a feed request is in flight
+var slowLoad = false; // the feed is taking a while (it can be slow to wake up)
 
 var MAIN = ['home', 'pets', 'adopt', 'apply', 'donate', 'more'];
 var TAB_OF = { home: 'home', pets: 'pets', pet: 'pets', adopt: 'adopt', apply: 'adopt', donate: 'donate', more: 'more' };
@@ -541,9 +545,9 @@ function renderGrid() {
   }
   var status = $('pet-status'), msg = '';
   if (feedState === 'loading') {
-    msg = 'Loading furbabies…';
+    msg = slowLoad ? 'Still fetching the furbabies, hang tight…' : 'Loading furbabies…';
   } else if (feedState === 'error') {
-    msg = 'We could not load the furbabies just now. Check your connection, or <a class="link" href="' +
+    msg = 'We could not load the furbabies just now. <button type="button" class="link" data-retry>Try again</button>, or <a class="link" href="' +
       LINKS.available + '" target="_blank" rel="noopener">see them on our website</a>.';
   } else if (!list.length) {
     msg = filter === 'Dog' ? 'No dogs are listed right now. Check back soon.'
@@ -618,28 +622,73 @@ function go(name, opts) {
 
 // Shows the last list this phone saw straight away, then swaps in the
 // fresh one. If the fresh one cannot be loaded, the saved list stays.
-function loadPets() {
-  try {
-    var saved = JSON.parse(localStorage.getItem('fbr-pets') || 'null');
-    if (saved && saved.length) { PETS = saved; feedState = 'ready'; renderAll(); }
-  } catch (e) {}
-  fetch(FEED_URL)
+// The feed can take a while to wake up, so each try gets a time limit and
+// a slow or failed try is retried before we give up.
+var FEED_TIMEOUT = 15000;
+var FEED_TRIES = 3;
+
+function fetchFeed() {
+  var ctrl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, FEED_TIMEOUT);
+  var req = fetch(FEED_URL, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
     .then(function (res) { if (!res.ok) throw new Error('feed ' + res.status); return res.json(); })
     .then(function (data) {
       if (!data || data.ok === false || !Array.isArray(data.pets)) throw new Error('feed unavailable');
-      PETS = data.pets.map(cleanPet);
+      return data.pets;
+    });
+  // Older phones without AbortController still get a time limit.
+  var limit = new Promise(function (_, reject) { setTimeout(function () { reject(new Error('feed timeout')); }, FEED_TIMEOUT + 500); });
+  return Promise.race([req, limit]).then(
+    function (pets) { clearTimeout(timer); return pets; },
+    function (err) { clearTimeout(timer); throw err; });
+}
+
+function loadPets() {
+  if (loading) return;
+  loading = true;
+  if (!PETS.length) {
+    try {
+      var saved = JSON.parse(localStorage.getItem('fbr-pets') || 'null');
+      if (saved && saved.length) { PETS = saved; feedState = 'ready'; }
+    } catch (e) {}
+  }
+  if (feedState === 'error') feedState = 'loading';
+  slowLoad = false;
+  renderAll();
+
+  var tries = 0;
+  (function attempt() {
+    tries++;
+    fetchFeed().then(function (pets) {
+      PETS = pets.map(cleanPet);
       feedState = 'ready';
+      fresh = true;
+      loading = slowLoad = false;
       try { localStorage.setItem('fbr-pets', JSON.stringify(PETS)); } catch (e) {}
       renderAll();
-    })
-    .catch(function () {
+    }).catch(function () {
+      if (tries < FEED_TRIES) {
+        if (!slowLoad) { slowLoad = true; if (feedState === 'loading') renderGrid(); }
+        setTimeout(attempt, 1500 * tries);
+        return;
+      }
+      loading = slowLoad = false;
       if (feedState !== 'ready') feedState = 'error';
       renderAll();
     });
+  })();
 }
+
+// If the list did not load, try again when the app comes back to the
+// screen or the phone gets a signal back, instead of needing a restart.
+function retryIfStale() { if (LIVE && !fresh && !document.hidden) loadPets(); }
+document.addEventListener('visibilitychange', retryIfStale);
+window.addEventListener('online', retryIfStale);
+window.addEventListener('pageshow', function (e) { if (e.persisted) retryIfStale(); });
 
 document.addEventListener('click', function (e) {
   var el = e.target.closest ? e.target.closest('[data-go], [data-filter]') : null;
+  if (e.target.closest && e.target.closest('[data-retry]')) { loadPets(); return; }
   if (!el) return;
   if (el.hasAttribute('data-filter')) { filter = el.getAttribute('data-filter'); renderGrid(); return; }
   e.preventDefault();
