@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Furbaby Ranch: meet adoptable furbabies, apply to adopt or foster, donate and shop. Veteran-owned rescue in Union, SC.">
+<meta name="theme-color" content="#101010">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Furbaby Ranch">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Furbaby Ranch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+/* base reset */
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* Layout: one phone-width column. Black top bar with the wordmark, five-tab bar fixed at the bottom, big tap targets. */
+:root {
+  --surface: #FBF6EC;
+  --surface-2: #F1E7D2;
+  --backdrop: #EDE3CC;
+  --border: #E3D5B8;
+  --ink: #1B1712;
+  --muted: #5E5546;
+  --gold: #E3A011;
+  --gold-text: #875D09;
+  --ranch-black: #101010;
+  --cream: #F7F1E3;
+  --hero-edge: #101010;
+  --chip-on-bg: #101010;
+  --chip-on-fg: #F7F1E3;
+  --ph-a: #E9D29A;
+  --ph-b: #C9CBBB;
+  --ph-c: #DCC3A2;
+  --ph-paw: #1B1712;
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans: "Nunito Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --r-sm: 6px;
+  --r-md: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: #121010; --surface-2: #1C1814; --backdrop: #0A0909; --border: #33291D;
+    --ink: #F5EFE2; --muted: #B8AD98; --gold-text: #E3A011; --hero-edge: #33291D;
+    --chip-on-bg: #E3A011; --chip-on-fg: #101010;
+    --ph-a: #3A2E12; --ph-b: #2C2E28; --ph-c: #33271B; --ph-paw: #F5EFE2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --surface: #121010; --surface-2: #1C1814; --backdrop: #0A0909; --border: #33291D;
+  --ink: #F5EFE2; --muted: #B8AD98; --gold-text: #E3A011; --hero-edge: #33291D;
+  --chip-on-bg: #E3A011; --chip-on-fg: #101010;
+  --ph-a: #3A2E12; --ph-b: #2C2E28; --ph-c: #33271B; --ph-paw: #F5EFE2;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--backdrop);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.shell {
+  max-width: 460px;
+  margin-inline: auto;
+  min-height: 100vh;
+  background: var(--surface);
+  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+}
+h1, h2, h3, p, ol, ul { margin: 0; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; }
+h1 { font-size: 28px; line-height: 34px; }
+h2 { font-size: 22px; line-height: 28px; }
+h3 { font-size: 18px; line-height: 24px; }
+h1:focus { outline: none; }
+a { color: inherit; }
+.ic { width: 24px; height: 24px; flex: none; }
+:focus-visible { outline: 3px solid var(--gold-text); outline-offset: 2px; border-radius: var(--r-sm); }
+
+/* top bar */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  display: flex; align-items: center; gap: 8px;
+  min-height: 56px; padding: 8px 16px;
+  background: var(--ranch-black); color: var(--cream);
+  border-bottom: 1px solid var(--hero-edge);
+}
+.bar .word { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--gold); letter-spacing: .01em; }
+.bar .back {
+  display: inline-flex; align-items: center; gap: 2px;
+  min-height: 40px; padding: 0 10px 0 4px; margin-left: -6px;
+  background: none; border: 0; color: var(--cream); font: 700 15px/20px var(--sans); cursor: pointer;
+}
+.bar .back:focus-visible { outline-color: var(--gold); }
+.draft {
+  padding: 8px 16px; font-size: 13px; line-height: 18px;
+  background: var(--surface-2); color: var(--muted); border-bottom: 1px solid var(--border);
+}
+.draft b { color: var(--ink); }
+
+/* views */
+.view { padding: 20px 16px 8px; display: flex; flex-direction: column; gap: 24px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.eyebrow { font-size: 12px; line-height: 16px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--gold-text); }
+.lede { color: var(--muted); }
+.row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.link { font-weight: 700; color: var(--gold-text); text-underline-offset: 3px; }
+
+/* hero */
+.hero {
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+  padding: 28px 20px 26px; border-radius: var(--r-md);
+  background: var(--ranch-black); color: var(--cream); border: 1px solid var(--hero-edge);
+}
+.hero img { width: 138px; height: auto; }
+.hero .tag { font-family: var(--display); font-weight: 600; font-size: 24px; line-height: 30px; text-wrap: balance; }
+.hero .eyebrow { color: var(--gold); }
+
+/* big home buttons */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tile {
+  display: flex; flex-direction: column; gap: 6px; min-height: 112px; padding: 16px;
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface-2); color: var(--ink); text-decoration: none;
+}
+.tile .t { font: 800 19px/24px var(--sans); }
+.tile .s { font-size: 14px; line-height: 19px; color: var(--muted); }
+.tile.primary { background: var(--gold); border-color: var(--gold); color: var(--ranch-black); }
+.tile.primary .s { color: var(--ranch-black); }
+
+/* buttons */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 56px; padding: 12px 18px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--ink);
+  font: 800 17px/22px var(--sans); text-decoration: none; text-align: center; cursor: pointer;
+}
+.btn.primary { background: var(--gold); border-color: var(--gold); color: var(--ranch-black); }
+.btn .ic { width: 20px; height: 20px; }
+.hint { font-size: 14px; line-height: 20px; color: var(--muted); }
+
+/* pets */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  min-height: 44px; padding: 0 18px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--ink);
+  font: 700 15px/20px var(--sans); cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: var(--chip-on-bg); border-color: var(--chip-on-bg); color: var(--chip-on-fg); }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.pet {
+  display: flex; flex-direction: column; min-width: 0;
+  border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden;
+  background: var(--surface-2); color: var(--ink); text-decoration: none;
+}
+.photo {
+  position: relative; aspect-ratio: 4 / 3; max-width: 100%;
+  display: grid; place-items: center; color: var(--ph-paw);
+}
+.photo.a { background: var(--ph-a); } .photo.b { background: var(--ph-b); } .photo.c { background: var(--ph-c); }
+.photo svg { width: 38%; height: auto; aspect-ratio: 1; opacity: .22; }
+.pill {
+  position: absolute; left: 8px; top: 8px; padding: 3px 9px; border-radius: 999px;
+  background: var(--ranch-black); color: var(--cream);
+  font: 800 11px/16px var(--sans); letter-spacing: .08em; text-transform: uppercase;
+}
+.pet .body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
+.pet .name { font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 24px; }
+.pet .meta { font-size: 14px; line-height: 19px; color: var(--muted); }
+
+/* pet detail */
+.detail-photo { border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+.stat { background: var(--surface-2); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font-size: 17px; line-height: 22px; }
+
+/* steps, fees, notices */
+.steps { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start; }
+.steps li::before {
+  content: counter(s); width: 36px; height: 36px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--gold); color: var(--ranch-black);
+  font: 800 17px/1 var(--sans);
+}
+.steps b { display: block; font-size: 17px; line-height: 22px; }
+.steps span { color: var(--muted); }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 12px 10px; text-align: right; border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+thead th { font-size: 12px; line-height: 16px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tbody td { font-size: 19px; font-weight: 700; }
+tbody td:first-child { font-size: 17px; }
+.note {
+  display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; padding: 14px;
+  border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface-2);
+}
+.note .ic { color: var(--gold-text); }
+.note b { display: block; }
+.note span { color: var(--muted); }
+
+/* list rows (More) */
+.rows { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+.rows a {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 56px; padding: 12px 14px; background: var(--surface-2); color: var(--ink);
+  text-decoration: none; font-weight: 700; font-size: 17px; border-bottom: 1px solid var(--border);
+}
+.rows a:last-child { border-bottom: 0; }
+.rows a .ic { width: 18px; height: 18px; color: var(--muted); }
+.rows small { display: block; font-weight: 400; font-size: 14px; line-height: 19px; color: var(--muted); }
+
+/* tab bar */
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; margin-inline: auto; max-width: 460px;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface); border-top: 1px solid var(--border);
+}
+.tabs a {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px;
+  min-height: 56px; color: var(--muted); text-decoration: none;
+  font: 700 12px/16px var(--sans);
+}
+.tabs a[aria-current="page"] { color: var(--gold-text); }
+@media (prefers-reduced-motion: no-preference) {
+  .tile, .btn, .pet, .chip { transition: transform .12s ease; }
+  .tile:active, .btn:active, .pet:active, .chip:active { transform: scale(.98); }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2V20h-5.2v-5.2H9.2V20H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><g fill="currentColor"><ellipse cx="5.6" cy="10.4" rx="2" ry="2.6"/><ellipse cx="9.8" cy="6.2" rx="2" ry="2.6"/><ellipse cx="14.4" cy="6.2" rx="2" ry="2.6"/><ellipse cx="18.5" cy="10.4" rx="2" ry="2.6"/><path d="M12.1 11.6c-2.6 0-5.1 2.9-5.1 5.4 0 1.7 1.3 2.6 2.8 2.6 1 0 1.5-.5 2.3-.5s1.3.5 2.3.5c1.5 0 2.8-.9 2.8-2.6 0-2.5-2.5-5.4-5.1-5.4z"/></g></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5M8.8 12.6l2.2 2.2 4.2-4.6"/></g></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></g></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16 16.5 7.5M9.5 7.5h7v7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.2v3.3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></g></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="bar">
+    <button class="back" id="back" type="button" hidden><svg class="ic"><use href="#i-back"/></svg>Back</button>
+    <span class="word" id="word">Furbaby Ranch</span>
+  </header>
+  <p class="draft"><b>Draft preview.</b> The pets shown are examples, not real listings.</p>
+
+  <main>
+    <!-- HOME -->
+    <section class="view" id="v-home">
+      <div class="hero">
+        <img src="icons/logo.png" width="316" height="320" alt="Furbaby Ranch shield logo">
+        <h1 class="tag" tabindex="-1">We don't just rescue. We rewrite endings.</h1>
+        <p class="eyebrow">Veteran-owned · Union, SC · Since 2012</p>
+      </div>
+
+      <nav class="tiles" aria-label="Main actions">
+        <a class="tile primary" href="#pets" data-go="pets"><svg class="ic"><use href="#i-paw"/></svg><span class="t">Adopt</span><span class="s">Meet the furbabies waiting for a home</span></a>
+        <a class="tile" href="#apply" data-go="apply"><svg class="ic"><use href="#i-home"/></svg><span class="t">Foster</span><span class="s">Give one a place to stay for a while</span></a>
+        <a class="tile" href="#donate" data-go="donate"><svg class="ic"><use href="#i-heart"/></svg><span class="t">Donate</span><span class="s">Help with vet care, food and transport</span></a>
+        <a class="tile" href="#more" data-go="more"><svg class="ic"><use href="#i-star"/></svg><span class="t">Shop</span><span class="s">Ranch tees, hoodies and gear</span></a>
+      </nav>
+
+      <div class="stack">
+        <div class="row-head"><h2>Meet the furbabies</h2><a class="link" href="#pets" data-go="pets">See all</a></div>
+        <div class="grid" id="home-pets"></div>
+      </div>
+    </section>
+
+    <!-- PETS -->
+    <section class="view" id="v-pets" hidden>
+      <div class="stack">
+        <h1 tabindex="-1">Available furbabies</h1>
+        <p class="lede">Tap a furbaby to read more and apply.</p>
+      </div>
+      <div class="chips" role="group" aria-label="Filter by animal">
+        <button class="chip" id="f-all" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="chip" id="f-dog" type="button" data-filter="Dog" aria-pressed="false">Dogs</button>
+        <button class="chip" id="f-cat" type="button" data-filter="Cat" aria-pressed="false">Cats</button>
+      </div>
+      <div class="grid" id="pet-grid"></div>
+    </section>
+
+    <!-- PET DETAIL -->
+    <section class="view" id="v-pet" hidden></section>
+
+    <!-- ADOPT -->
+    <section class="view" id="v-adopt" hidden>
+      <div class="stack">
+        <h1 tabindex="-1">How adoption works</h1>
+        <p class="lede">Four steps, all online, from application to bringing your furbaby home.</p>
+      </div>
+      <ol class="steps">
+        <li><div><b>Apply online</b><span>Fill out the adoption application for the furbaby you'd like to meet.</span></div></li>
+        <li><div><b>We review it</b><span>Our adoption team reads every application and gets in touch with you.</span></div></li>
+        <li><div><b>Sign the contract</b><span>Once you're approved, you sign the adoption contract.</span></div></li>
+        <li><div><b>Get the medical records</b><span>We email your furbaby's medical records to you.</span></div></li>
+      </ol>
+      <a class="btn primary" href="#apply" data-go="apply">Start an application</a>
+
+      <div class="stack">
+        <h2>Adoption fees</h2>
+        <div class="tbl">
+          <table>
+            <thead><tr><th scope="col">Furbaby</th><th scope="col">Local (SC)</th><th scope="col">Northeast</th></tr></thead>
+            <tbody>
+              <tr><td>Dogs</td><td>$400</td><td>$550</td></tr>
+              <tr><td>Cats</td><td>$150</td><td>$300</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hint">Northeast fees include $150 for transport.</p>
+      </div>
+
+      <div class="stack">
+        <div class="note"><svg class="ic"><use href="#i-star"/></svg><div><b>Veterans save 10%</b><span>Veterans get 10% off the adoption fee.</span></div></div>
+        <div class="note"><svg class="ic"><use href="#i-truck"/></svg><div><b>Adopting from the Northeast</b><span>You meet the transport at a set location. We send the address once your adoption is final.</span></div></div>
+        <div class="note"><svg class="ic"><use href="#i-cal"/></svg><div><b>Visits by appointment only</b><span>The ranch is not open to the public. Approved adopters can arrange a visit ahead of time.</span></div></div>
+      </div>
+    </section>
+
+    <!-- APPLY -->
+    <section class="view" id="v-apply" hidden>
+      <div class="stack">
+        <h1 tabindex="-1">Apply</h1>
+        <p class="lede">Applications open in your browser.</p>
+      </div>
+      <div class="stack">
+        <h2>Adopt</h2>
+        <p>Ready to give a furbaby a furever home? Tell us about your household and the pet you have in mind.</p>
+        <a class="btn primary" data-link="adoptDog" target="_blank" rel="noopener">Dog adoption application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <a class="btn primary" data-link="adoptCat" target="_blank" rel="noopener">Cat adoption application<svg class="ic"><use href="#i-ext"/></svg></a>
+      </div>
+      <div class="stack">
+        <h2>Foster</h2>
+        <p>Fosters give a furbaby a home while they wait for theirs. Apply and our team will follow up with you.</p>
+        <a class="btn" data-link="fosterDog" target="_blank" rel="noopener">Dog foster application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <a class="btn" data-link="fosterCat" target="_blank" rel="noopener">Cat foster application<svg class="ic"><use href="#i-ext"/></svg></a>
+      </div>
+      <a class="link" href="#adopt" data-go="adopt">See the steps and fees</a>
+    </section>
+
+    <!-- DONATE -->
+    <section class="view" id="v-donate" hidden>
+      <div class="stack">
+        <h1 tabindex="-1">Help rewrite an ending</h1>
+        <p class="lede">Donations help pay for vet care, food and transport for the furbabies in our care.</p>
+      </div>
+      <div class="stack">
+        <a class="btn primary" data-link="paypal" target="_blank" rel="noopener">Donate with PayPal<svg class="ic"><use href="#i-ext"/></svg></a>
+        <p class="hint">PayPal opens in your browser. Give any amount you like.</p>
+      </div>
+      <div class="stack">
+        <h2>More ways to give</h2>
+        <div class="rows">
+          <a data-link="cashapp" target="_blank" rel="noopener"><span>Cash App<small>$furbabyranch</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="venmo" target="_blank" rel="noopener"><span>Venmo<small>@furbabyranch</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="zelle" target="_blank" rel="noopener"><span>Zelle<small>Opens the QR code on our website</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="wishlist" target="_blank" rel="noopener"><span>Amazon Wishlist<small>Send supplies straight to the ranch</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+        </div>
+      </div>
+      <div class="stack">
+        <h2>Other ways to help</h2>
+        <div class="rows">
+          <a href="#apply" data-go="apply"><span>Foster a furbaby<small>Give one a place to stay for a while</small></span></a>
+          <a href="#more" data-go="more"><span>Shop ranch gear<small>Tees, hoodies and more</small></span></a>
+          <a href="#pets" data-go="pets"><span>Share a furbaby<small>Show a friend who is waiting for a home</small></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MORE -->
+    <section class="view" id="v-more" hidden>
+      <h1 tabindex="-1">More</h1>
+      <div class="stack">
+        <h2>Shop</h2>
+        <div class="rows">
+          <a data-link="shop" target="_blank" rel="noopener"><span>Furbaby Ranch store<small>Fall line and the Rescue Crew Collection</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+        </div>
+      </div>
+      <div class="stack">
+        <h2>Follow the ranch</h2>
+        <div class="rows">
+          <a data-link="facebook" target="_blank" rel="noopener"><span>Facebook</span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="instagram" target="_blank" rel="noopener"><span>Instagram</span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="tiktok" target="_blank" rel="noopener"><span>TikTok</span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="youtube" target="_blank" rel="noopener"><span>YouTube</span><svg class="ic"><use href="#i-ext"/></svg></a>
+        </div>
+      </div>
+      <div class="stack">
+        <h2>On the web</h2>
+        <div class="rows">
+          <a data-link="contact" target="_blank" rel="noopener"><span>Questions about adoption?<small>Send us a message</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="site" target="_blank" rel="noopener"><span>furbabyranch.com</span><svg class="ic"><use href="#i-ext"/></svg></a>
+        </div>
+      </div>
+      <div class="stack">
+        <h2>Keep the ranch on your phone</h2>
+        <p class="lede">Once the app is live, you can add it to your home screen like any other app.</p>
+        <ol class="steps">
+          <li><div><b>iPhone</b><span>Tap Share, then Add to Home Screen.</span></div></li>
+          <li><div><b>Android</b><span>Tap the menu, then Add to Home screen.</span></div></li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="App sections">
+    <a href="#home" data-go="home" data-tab="home"><svg class="ic"><use href="#i-home"/></svg>Home</a>
+    <a href="#pets" data-go="pets" data-tab="pets"><svg class="ic"><use href="#i-paw"/></svg>Pets</a>
+    <a href="#adopt" data-go="adopt" data-tab="adopt"><svg class="ic"><use href="#i-steps"/></svg>Adopt</a>
+    <a href="#donate" data-go="donate" data-tab="donate"><svg class="ic"><use href="#i-heart"/></svg>Donate</a>
+    <a href="#more" data-go="more" data-tab="more"><svg class="ic"><use href="#i-more"/></svg>More</a>
+  </nav>
+</div>
+
+<script>
+// Every outside link lives here so it can be swapped in one place.
+var LINKS = {
+  adoptDog: 'https://new.shelterluv.com/matchme/adopt/FRSC/Dog',
+  adoptCat: 'https://new.shelterluv.com/matchme/adopt/FRSC/Cat',
+  fosterDog: 'https://new.shelterluv.com/matchme/foster/FRSC/Dog',
+  fosterCat: 'https://new.shelterluv.com/matchme/foster/FRSC/Cat',
+  paypal: 'https://www.paypal.com/donate/?hosted_button_id=HSFXRV7TJK5MW',
+  cashapp: 'https://cash.app/$furbabyranch',
+  venmo: 'https://account.venmo.com/u/furbabyranch',
+  zelle: 'https://furbabyranch.com/links',
+  wishlist: 'https://www.amazon.com/hz/wishlist/ls/1WVWM0VMSS1RX',
+  shop: 'https://furbabyranch.com/shop',
+  facebook: 'https://www.facebook.com/FurbabyRanch/',
+  instagram: 'https://instagram.com/furbabyranch',
+  youtube: 'https://www.youtube.com/@furbabyranch',
+  tiktok: 'https://www.tiktok.com/@mrdarkco',
+  contact: 'https://furbabyranch.com/contact',
+  site: 'https://furbabyranch.com/'
+};
+
+// Example listings only. The live app reads this list from Shelterluv.
+var PETS = [
+  { id: 'biscuit', name: 'Biscuit', kind: 'Dog', breed: 'Hound mix', age: '2 years', sex: 'Male', fixed: 'Neutered', tone: 'a',
+    about: 'Biscuit greets everyone like an old friend. He walks well on a leash and rides quietly in the car.' },
+  { id: 'juniper', name: 'Juniper', kind: 'Cat', breed: 'Domestic shorthair', age: '1 year', sex: 'Female', fixed: 'Spayed', tone: 'b',
+    about: 'Juniper is a window watcher who warms up fast. She likes a quiet lap and a sunny spot.' },
+  { id: 'tank', name: 'Tank', kind: 'Dog', breed: 'Lab mix', age: '4 years', sex: 'Male', fixed: 'Neutered', tone: 'c',
+    about: 'Tank is a big, gentle guy who loves a game of fetch and settles down easily afterward.' },
+  { id: 'clementine', name: 'Clementine', kind: 'Cat', breed: 'Orange tabby', age: '3 years', sex: 'Female', fixed: 'Spayed', tone: 'a',
+    about: 'Clementine talks to you while you cook and follows you from room to room.' },
+  { id: 'moose', name: 'Moose', kind: 'Dog', breed: 'Shepherd mix', age: '8 months', sex: 'Male', fixed: 'Neutered', tone: 'b',
+    about: 'Moose is a smart, busy pup who is learning his manners and wants someone to learn with.' },
+  { id: 'pepper', name: 'Pepper', kind: 'Dog', breed: 'Terrier mix', age: '6 years', sex: 'Female', fixed: 'Spayed', tone: 'c',
+    about: 'Pepper is a calm companion who is happiest on a short walk followed by a long nap.' }
+];
+
+var MAIN = ['home', 'pets', 'adopt', 'apply', 'donate', 'more'];
+var TAB_OF = { home: 'home', pets: 'pets', pet: 'pets', adopt: 'adopt', apply: 'adopt', donate: 'donate', more: 'more' };
+var PARENT = { pet: 'pets', apply: 'adopt' };
+var filter = 'all';
+var current = null;
+
+function $(id) { return document.getElementById(id); }
+
+function card(p) {
+  return '<a class="pet" href="#pet-' + p.id + '" data-go="pet-' + p.id + '">' +
+    '<div class="photo ' + p.tone + '"><span class="pill">Example</span><svg><use href="#i-paw"/></svg></div>' +
+    '<div class="body"><span class="name">' + p.name + '</span>' +
+    '<span class="meta">' + p.breed + '</span><span class="meta">' + p.age + ' · ' + p.sex + '</span></div></a>';
+}
+
+function renderGrid() {
+  var list = PETS.filter(function (p) { return filter === 'all' || p.kind === filter; });
+  $('pet-grid').innerHTML = list.map(card).join('');
+  var chips = document.querySelectorAll('.chip');
+  for (var i = 0; i < chips.length; i++) {
+    chips[i].setAttribute('aria-pressed', String(chips[i].getAttribute('data-filter') === filter));
+  }
+}
+
+function renderPet(p) {
+  var fee = p.kind === 'Dog' ? '$400' : '$150';
+  $('v-pet').innerHTML =
+    '<div class="detail-photo"><div class="photo ' + p.tone + '"><span class="pill">Example</span><svg><use href="#i-paw"/></svg></div></div>' +
+    '<div class="stack"><p class="eyebrow">Available now</p><h1 tabindex="-1">Meet ' + p.name + '</h1><p>' + p.about + '</p></div>' +
+    '<div class="stats">' +
+      '<div class="stat"><span class="eyebrow">Age</span><b>' + p.age + '</b></div>' +
+      '<div class="stat"><span class="eyebrow">Breed</span><b>' + p.breed + '</b></div>' +
+      '<div class="stat"><span class="eyebrow">Sex</span><b>' + p.sex + '</b></div>' +
+      '<div class="stat"><span class="eyebrow">Fixed</span><b>' + p.fixed + '</b></div>' +
+    '</div>' +
+    '<div class="stack"><a class="btn primary" href="' + (p.kind === 'Dog' ? LINKS.adoptDog : LINKS.adoptCat) + '" target="_blank" rel="noopener">Apply to adopt ' + p.name +
+      '<svg class="ic"><use href="#i-ext"/></svg></a>' +
+    '<p class="hint">Adoption fee: ' + fee + ' for local South Carolina adopters. ' +
+      '<a class="link" href="#adopt" data-go="adopt">See all fees and transport</a></p></div>';
+}
+
+function go(name, opts) {
+  var view = name, pet = null;
+  if (name.indexOf('pet-') === 0) {
+    pet = PETS.filter(function (p) { return p.id === name.slice(4); })[0];
+    view = pet ? 'pet' : 'pets';
+    if (!pet) name = 'pets';
+  } else if (MAIN.indexOf(name) < 0) {
+    view = name = 'home';
+  }
+  if (pet) renderPet(pet);
+  var all = MAIN.concat(['pet']);
+  for (var i = 0; i < all.length; i++) $('v-' + all[i]).hidden = all[i] !== view;
+
+  var tabs = document.querySelectorAll('.tabs a');
+  for (var j = 0; j < tabs.length; j++) {
+    if (tabs[j].getAttribute('data-tab') === TAB_OF[view]) tabs[j].setAttribute('aria-current', 'page');
+    else tabs[j].removeAttribute('aria-current');
+  }
+  $('back').hidden = !PARENT[view];
+  $('back').setAttribute('data-go', PARENT[view] || 'home');
+  current = name;
+
+  if (!(opts && opts.fromHash)) {
+    try { if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name); } catch (e) {}
+  }
+  if (!(opts && opts.first)) {
+    window.scrollTo(0, 0);
+    var h = $('v-' + view).querySelector('h1');
+    if (h) { try { h.focus({ preventScroll: true }); } catch (e) {} }
+  }
+}
+
+document.addEventListener('click', function (e) {
+  var el = e.target.closest ? e.target.closest('[data-go], [data-filter]') : null;
+  if (!el) return;
+  if (el.hasAttribute('data-filter')) { filter = el.getAttribute('data-filter'); renderGrid(); return; }
+  e.preventDefault();
+  go(el.getAttribute('data-go'));
+});
+window.addEventListener('hashchange', function () {
+  var h = location.hash.replace('#', '');
+  if (h && h !== current) go(h, { fromHash: true });
+});
+
+(function start() {
+  var out = document.querySelectorAll('[data-link]');
+  for (var i = 0; i < out.length; i++) out[i].setAttribute('href', LINKS[out[i].getAttribute('data-link')]);
+  $('home-pets').innerHTML = PETS.slice(0, 2).map(card).join('');
+  renderGrid();
+  go(location.hash.replace('#', '') || 'home', { first: true, fromHash: true });
+})();
+</script>
+
+<script>
+// Lets the app open quickly and work on a weak signal once it is installed.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>
