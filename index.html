@@ -329,7 +329,7 @@ tbody td:first-child { font-size: 17px; }
 
       <nav class="tiles" aria-label="Main actions">
         <a class="tile primary" href="#pets" data-go="pets"><svg class="ic"><use href="#i-paw"/></svg><span class="t">Adopt</span><span class="s">Meet the furbabies waiting for a home</span></a>
-        <a class="tile" href="#apply" data-go="apply"><svg class="ic"><use href="#i-home"/></svg><span class="t">Foster</span><span class="s">Give one a place to stay for a while</span></a>
+        <a class="tile" href="#foster" data-go="foster"><svg class="ic"><use href="#i-home"/></svg><span class="t">Foster</span><span class="s">Give one a place to stay for a while</span></a>
         <a class="tile" href="#donate" data-go="donate"><svg class="ic"><use href="#i-heart"/></svg><span class="t">Donate</span><span class="s">Help with vet care, food and transport</span></a>
         <a class="tile" data-link="shop" target="_blank" rel="noopener"><svg class="ic"><use href="#i-star"/></svg><span class="t">Shop</span><span class="s">Ranch tees, hoodies and gear</span></a>
       </nav>
@@ -370,7 +370,13 @@ tbody td:first-child { font-size: 17px; }
         <li><div><b>Sign the contract</b><span>Once you're approved, you sign the adoption contract.</span></div></li>
         <li><div><b>Get the medical records</b><span>We email your furbaby's medical records to you.</span></div></li>
       </ol>
-      <a class="btn primary" href="#apply" data-go="apply">Start an application</a>
+      <div class="stack">
+        <h2>Apply to adopt</h2>
+        <p>Ready to give a furbaby a furever home? Tell us about your household and the pet you have in mind.</p>
+        <a class="btn primary" data-link="adoptDog" target="_blank" rel="noopener">Dog adoption application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <a class="btn primary" data-link="adoptCat" target="_blank" rel="noopener">Cat adoption application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <p class="hint">Applications open in your browser.</p>
+      </div>
 
       <div class="stack">
         <h2>Adoption fees</h2>
@@ -392,25 +398,29 @@ tbody td:first-child { font-size: 17px; }
       </div>
     </section>
 
-    <!-- APPLY -->
-    <section class="view" id="v-apply" hidden>
+    <!-- FOSTER -->
+    <section class="view" id="v-foster" hidden>
       <div class="stack">
-        <h1 tabindex="-1">Apply</h1>
-        <p class="lede">Applications open in your browser.</p>
+        <h1 tabindex="-1">Foster</h1>
+        <p class="lede">Foster a furbaby until they find their forever home.</p>
       </div>
       <div class="stack">
-        <h2>Adopt</h2>
-        <p>Ready to give a furbaby a furever home? Tell us about your household and the pet you have in mind.</p>
-        <a class="btn primary" data-link="adoptDog" target="_blank" rel="noopener">Dog adoption application<svg class="ic"><use href="#i-ext"/></svg></a>
-        <a class="btn primary" data-link="adoptCat" target="_blank" rel="noopener">Cat adoption application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <h2>Apply to foster</h2>
+        <p>Apply below and we'll be in touch. Applications open in your browser.</p>
+        <a class="btn primary" data-link="fosterDog" target="_blank" rel="noopener">Dog foster application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <a class="btn primary" data-link="fosterCat" target="_blank" rel="noopener">Cat foster application<svg class="ic"><use href="#i-ext"/></svg></a>
       </div>
       <div class="stack">
-        <h2>Foster</h2>
-        <p>Foster a furbaby until they find their forever home. Apply below and we'll be in touch.</p>
-        <a class="btn" data-link="fosterDog" target="_blank" rel="noopener">Dog foster application<svg class="ic"><use href="#i-ext"/></svg></a>
-        <a class="btn" data-link="fosterCat" target="_blank" rel="noopener">Cat foster application<svg class="ic"><use href="#i-ext"/></svg></a>
+        <h2>For our fosters</h2>
+        <div class="rows">
+          <a data-link="fosterArea" target="_blank" rel="noopener"><span>Foster area<small>Guides, contacts and forms. Holly sends you the password.</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+          <a data-link="fosterGroup" target="_blank" rel="noopener"><span>Fosters' Facebook group<small>Post updates and see announcements</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
+        </div>
       </div>
-      <a class="link" href="#adopt" data-go="adopt">See the steps and fees</a>
+      <div class="stack">
+        <h2>Looking to adopt?</h2>
+        <a class="btn" href="#adopt" data-go="adopt">Go to the Adopt page</a>
+      </div>
     </section>
 
     <!-- DONATE -->
@@ -435,7 +445,7 @@ tbody td:first-child { font-size: 17px; }
       <div class="stack">
         <h2>Other ways to help</h2>
         <div class="rows">
-          <a href="#apply" data-go="apply"><span>Foster a furbaby<small>Give one a place to stay for a while</small></span></a>
+          <a href="#foster" data-go="foster"><span>Foster a furbaby<small>Give one a place to stay for a while</small></span></a>
           <a data-link="shop" target="_blank" rel="noopener"><span>Shop ranch gear<small>Tees, hoodies and more</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
           <a href="#pets" data-go="pets"><span>Share a furbaby<small>Show a friend who is waiting for a home</small></span></a>
         </div>
@@ -559,9 +569,9 @@ var fresh = false;    // true once this visit has the live list
 var loading = false;  // a feed request is in flight
 var slowLoad = false; // the feed is taking a while (it can be slow to wake up)
 
-var MAIN = ['home', 'pets', 'adopt', 'apply', 'donate', 'more'];
-var TAB_OF = { home: 'home', pets: 'pets', pet: 'pets', adopt: 'adopt', apply: 'adopt', donate: 'donate', more: 'more' };
-var PARENT = { pet: 'pets', apply: 'adopt' };
+var MAIN = ['home', 'pets', 'adopt', 'foster', 'donate', 'more'];
+var TAB_OF = { home: 'home', pets: 'pets', pet: 'pets', adopt: 'adopt', foster: 'home', donate: 'donate', more: 'more' };
+var PARENT = { pet: 'pets', foster: 'home' };
 var filter = 'all';
 var current = null;
 
@@ -661,6 +671,7 @@ function renderPet(p) {
 }
 
 function go(name, opts) {
+  if (name === 'apply') name = 'foster'; // old address of the Foster screen
   var view = name, pet = null;
   if (name.indexOf('pet-') === 0) {
     pet = PETS.filter(function (p) { return p.id === name.slice(4); })[0];
