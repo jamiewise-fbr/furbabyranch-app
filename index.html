@@ -147,6 +147,7 @@ button.link { background: none; border: 0; padding: 0; font: inherit; font-weigh
 }
 .btn.primary { background: var(--gold); border-color: var(--gold); color: var(--ranch-black); }
 .btn .ic { width: 20px; height: 20px; }
+#more-ri { scroll-margin-top: 72px; }
 .hint { font-size: 14px; line-height: 20px; color: var(--muted); }
 
 /* pets */
@@ -338,6 +339,10 @@ tbody td:first-child { font-size: 17px; }
         <div class="row-head"><h2>Meet the furbabies</h2><a class="link" href="#pets" data-go="pets">See all</a></div>
         <div class="grid" id="home-pets"></div>
       </div>
+
+      <div class="stack">
+        <a class="btn" href="#more" data-go="more" data-scroll="more-ri"><svg class="ic"><use href="#i-heart"/></svg>Follow Furbaby Ranch RI</a>
+      </div>
     </section>
 
     <!-- PETS -->
@@ -470,7 +475,7 @@ tbody td:first-child { font-size: 17px; }
           <a data-link="youtube" target="_blank" rel="noopener"><span>YouTube</span><svg class="ic"><use href="#i-ext"/></svg></a>
         </div>
       </div>
-      <div class="stack">
+      <div class="stack" id="more-ri">
         <h2>Furbaby Ranch RI</h2>
         <div class="rows">
           <a data-link="riFacebook" target="_blank" rel="noopener"><span>Facebook<small>Furbaby Ranch Rhode Island</small></span><svg class="ic"><use href="#i-ext"/></svg></a>
@@ -787,6 +792,7 @@ document.addEventListener('click', function (e) {
   e.preventDefault();
   pendingPet = null;
   go(el.getAttribute('data-go'));
+  if (el.hasAttribute('data-scroll')) $(el.getAttribute('data-scroll')).scrollIntoView();
 });
 window.addEventListener('hashchange', function () {
   var h = location.hash.replace('#', '');
